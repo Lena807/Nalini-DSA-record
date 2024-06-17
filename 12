@@ -1,0 +1,199 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10
+
+typedef struct {
+    int key;
+    int value;
+} HashItem;
+
+HashItem* hashTable[TABLE_SIZE];
+
+int hashCode(int key) {
+    return key % TABLE_SIZE;
+}
+
+void insert(int key, int value) {
+    int hashIndex = hashCode(key);
+
+    while (hashTable[hashIndex] != NULL && hashTable[hashIndex]->key != -1) {
+        hashIndex = (hashIndex + 1) % TABLE_SIZE;
+    }
+
+    if (hashTable[hashIndex] == NULL) {
+        hashTable[hashIndex] = (HashItem*) malloc(sizeof(HashItem));
+    }
+    hashTable[hashIndex]->key = key;
+    hashTable[hashIndex]->value = value;
+}
+
+void display() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if (hashTable[i] != NULL && hashTable[i]->key != -1)
+            printf("(%d, %d) ", hashTable[i]->key, hashTable[i]->value);
+        else
+            printf(" ~~ ");
+    }
+    printf("\n");
+}
+
+int main() {
+    for (int i = 0; i < TABLE_SIZE; i++)
+        hashTable[i] = NULL;
+
+    insert(1, 20);
+    insert(2, 70);
+    insert(42, 80);
+    insert(4, 25);
+    insert(12, 44);
+    insert(14, 32);
+    insert(17, 11);
+    insert(13, 78);
+    insert(37, 97);
+
+    display();
+    return 0;
+}
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10
+
+typedef struct Node {
+    int key;
+    int value;
+    struct Node* next;
+} Node;
+
+Node* hashTable[TABLE_SIZE];
+
+int hashCode(int key) {
+    return key % TABLE_SIZE;
+}
+
+void insert(int key, int value) {
+    int hashIndex = hashCode(key);
+    Node* newNode = (Node*) malloc(sizeof(Node));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = hashTable[hashIndex];
+    hashTable[hashIndex] = newNode;
+}
+
+void display() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Node* temp = hashTable[i];
+        printf("[%d]: ", i);
+        while (temp) {
+            printf("(%d, %d) -> ", temp->key, temp->value);
+            temp = temp->next;
+        }
+        printf("NULL\n");
+    }
+}
+
+int main() {
+    for (int i = 0; i < TABLE_SIZE; i++)
+        hashTable[i] = NULL;
+
+    insert(1, 20);
+    insert(2, 70);
+    insert(42, 80);
+    insert(4, 25);
+    insert(12, 44);
+    insert(14, 32);
+    insert(17, 11);
+    insert(13, 78);
+    insert(37, 97);
+
+    display();
+    return 0;
+}
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 10
+#define LOAD_FACTOR 0.7
+
+typedef struct {
+    int key;
+    int value;
+} HashItem;
+
+HashItem* hashTable[TABLE_SIZE];
+int currentSize = 0;
+
+int hashCode(int key) {
+    return key % TABLE_SIZE;
+}
+
+void rehash() {
+    int oldSize = TABLE_SIZE;
+    HashItem** oldTable = hashTable;
+    hashTable = (HashItem**) malloc(TABLE_SIZE * 2 * sizeof(HashItem*));
+
+    for (int i = 0; i < TABLE_SIZE * 2; i++) {
+        hashTable[i] = NULL;
+    }
+
+    for (int i = 0; i < oldSize; i++) {
+        if (oldTable[i] != NULL && oldTable[i]->key != -1) {
+            int hashIndex = hashCode(oldTable[i]->key);
+            while (hashTable[hashIndex] != NULL) {
+                hashIndex = (hashIndex + 1) % (TABLE_SIZE * 2);
+            }
+            hashTable[hashIndex] = oldTable[i];
+        }
+    }
+
+    free(oldTable);
+}
+
+void insert(int key, int value) {
+    if ((float) currentSize / TABLE_SIZE > LOAD_FACTOR) {
+        rehash();
+    }
+
+    int hashIndex = hashCode(key);
+
+    while (hashTable[hashIndex] != NULL && hashTable[hashIndex]->key != -1) {
+        hashIndex = (hashIndex + 1) % TABLE_SIZE;
+    }
+
+    if (hashTable[hashIndex] == NULL) {
+        hashTable[hashIndex] = (HashItem*) malloc(sizeof(HashItem));
+        currentSize++;
+    }
+    hashTable[hashIndex]->key = key;
+    hashTable[hashIndex]->value = value;
+}
+
+void display() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if (hashTable[i] != NULL && hashTable[i]->key != -1)
+            printf("(%d, %d) ", hashTable[i]->key, hashTable[i]->value);
+        else
+            printf(" ~~ ");
+    }
+    printf("\n");
+}
+
+int main() {
+    for (int i = 0; i < TABLE_SIZE; i++)
+        hashTable[i] = NULL;
+
+    insert(1, 20);
+    insert(2, 70);
+    insert(42, 80);
+    insert(4, 25);
+    insert(12, 44);
+    insert(14, 32);
+    insert(17, 11);
+    insert(13, 78);
+    insert(37, 97);
+
+    display();
+    return 0;
+}
+
